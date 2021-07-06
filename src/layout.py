@@ -5,21 +5,15 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
 from dash.dependencies import Input, Output, State
-import awswrangler as wr
 from utils.constants import APP_LOGO
-
-path = "s3://turing-redcap-dashboard/dataset/"
-
-df = wr.s3.read_parquet(path, dataset=True)
-
-
+from utils.data import df
 # add callback for toggling the collapse on small screens
 
 dropdown = dcc.Dropdown(
     id = 'plot-dropdown',
     options = [
         {'label': 'Barplot', 'value': 'bp'},
-        {'label': 'Mapplot', 'value': 'mp'},
+        {'label': 'Lineplot', 'value': 'lp'},
         {'label': 'Scatterplot', 'value': 'sp'}
     ],
     value = 'bp'
@@ -43,35 +37,12 @@ layout = html.Div([
                 no_gutters=True,
             ),
         ),
-        dbc.DropdownMenu(
-            label = "Menu",
-            id = "menu-dropdown",
-            children=[
-                dbc.DropdownMenuItem("Barplot"),
-                dbc.DropdownMenuItem("Scatterplot"),
-                dbc.DropdownMenuItem("Mapplot")
-            ]
-        )
+        dropdown,
     ],
     color="dark",
     dark=True
     ),
-    dcc.Graph(
-        id = 'samplechart',
-        figure={
-            'data' : [
-                go.Bar(
-                    x = df['idade'],
-                    y = df['tabagismo'],
-                    width = 2
-                )
-            ],
-            'layout' : go.Layout(
-                title = 'Scatterplot of age and tabagism',
-                xaxis = {'title' : 'Age'},
-                yaxis = {'title': 'Profit'}
-            )
-        }
-    ),
-    html.Div(id='output')
+    html.H1(id="graph_title"),
+    dcc.Graph(id='graph_output'),
+    html.Div(id='menu_output')
 ])
